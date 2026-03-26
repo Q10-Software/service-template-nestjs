@@ -1,11 +1,11 @@
 import { plainToInstance } from 'class-transformer';
 import { validateSync, ValidationError } from 'class-validator';
-import { AppInfoAggregate } from '@context/appInfo/domain/aggregates/appInfo.aggregate';
+import { GetAppInfoOutput } from '@context/appInfo/application/useCases/getAppInfo.output';
 import { GetAppInfoDto } from './appInfo.dto';
 import { ValidationOutputException } from './validation-output.exception';
 
 export class GetAppInfoMapper {
-  toResponse(appInfo: AppInfoAggregate): GetAppInfoDto {
+  toResponse(appInfo: GetAppInfoOutput): GetAppInfoDto {
     const data: GetAppInfoDto = {
       status: appInfo.status,
       name: appInfo.name,
