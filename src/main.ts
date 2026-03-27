@@ -1,18 +1,22 @@
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './api/modules/app.module';
-
-function isDebugEnv(): boolean {
-  const v = process.env.DEBUG;
-  return v === '1' || v === 'true';
-}
+import { HttpConfig, LoggerConfig } from './api/config/config.types';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: isDebugEnv()
+  const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  const logger = configService.getOrThrow<LoggerConfig>('logger');
+  const http = configService.getOrThrow<HttpConfig>('http');
+
+  app.useLogger(
+    logger.debug
       ? ['error', 'warn', 'log', 'debug', 'verbose']
       : ['log', 'error', 'warn'],
-  });
-  await app.listen(process.env.PORT ?? 3000);
+  );
+
+  await app.listen(http.port);
 }
 
 void bootstrap();
