@@ -1,6 +1,6 @@
 export interface GetAppInfoOutput {
   status: 'ok';
-  name: string;
+  serviceName: string;
   version: string;
   startedAt: Date;
 }

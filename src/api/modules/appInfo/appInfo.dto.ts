@@ -6,7 +6,7 @@ export class GetAppInfoDto {
   status!: 'ok';
 
   @IsString()
-  name!: string;
+  serviceName!: string;
 
   @IsString()
   version!: string;

@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
+import { AppModule } from '../src/api/modules/app.module';
 
-describe('HealthController (e2e)', () => {
+describe('AppInfoController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -16,9 +16,9 @@ describe('HealthController (e2e)', () => {
     await app.init();
   });
 
-  it('GET /health should return 200 and a validated payload', () => {
+  it('GET /info should return 200 and a validated payload', () => {
     return request(app.getHttpServer())
-      .get('/health')
+      .get('/info')
       .expect(200)
       .expect((res) => {
         const body = res.body as {

@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './api/modules/app.module';
 
 function isDebugEnv(): boolean {
   const v = process.env.DEBUG;
