@@ -2,7 +2,7 @@ import pino, { Logger as PinoLogger } from 'pino';
 import {
   IAppLoggerPort,
   LogContext,
-} from '../../contexts/shared/application/ports/logger.port';
+} from '../../contexts/_shared/application/ports/logger.port';
 
 export interface BuildPinoLoggerOptions {
   service: string;

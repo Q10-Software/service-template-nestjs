@@ -6,8 +6,8 @@ import {
 import {
   APP_LOGGER_PORT,
   LogContext,
-} from '../../../contexts/shared/application/ports/logger.port';
-import type { IAppLoggerPort } from '../../../contexts/shared/application/ports/logger.port';
+} from '../../../contexts/_shared/application/ports/logger.port';
+import type { IAppLoggerPort } from '../../../contexts/_shared/application/ports/logger.port';
 
 @Injectable()
 export class LoggerService implements ILoggerService {

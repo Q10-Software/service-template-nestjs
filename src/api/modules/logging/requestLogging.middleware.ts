@@ -1,8 +1,8 @@
 import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import type { NextFunction, Request, Response } from 'express';
-import { APP_LOGGER_PORT } from '../../../contexts/shared/application/ports/logger.port';
-import type { IAppLoggerPort } from '../../../contexts/shared/application/ports/logger.port';
+import { APP_LOGGER_PORT } from '../../../contexts/_shared/application/ports/logger.port';
+import type { IAppLoggerPort } from '../../../contexts/_shared/application/ports/logger.port';
 
 @Injectable()
 export class RequestLoggingMiddleware implements NestMiddleware {

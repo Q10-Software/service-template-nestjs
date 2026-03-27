@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { APP_LOGGER_PORT } from '../../../contexts/shared/application/ports/logger.port';
+import { APP_LOGGER_PORT } from '../../../contexts/_shared/application/ports/logger.port';
 import { PinoLoggerAdapter } from '../../../infrastructure/adapters/pinoLogger.adapter';
 import { LoggerService } from './logger.service';
 import { normalizeLoggerConfig } from './loggingConfig.utils';
