@@ -3,7 +3,7 @@ import { IRootEntity } from '@context/_shared/domain/interfaces/root.entity';
 import { IRootRepository } from '@context/_shared/domain/repositories/root.repository';
 import { IDocumentRootEntity } from '@infrastructure/_shared/persistence/interfaces/doc.root';
 
-export abstract class MemoryBaseRepository<
+export abstract class RootMemoryRepository<
   D extends IDocumentRootEntity,
   A extends RootAggregate<IRootEntity>,
 > implements IRootRepository<A> {
