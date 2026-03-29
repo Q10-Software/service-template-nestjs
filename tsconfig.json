@@ -15,7 +15,8 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@context/*": ["src/contexts/*"]
+      "@context/*": ["src/contexts/*"],
+      "@infrastructure/*": ["src/infrastructure/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
