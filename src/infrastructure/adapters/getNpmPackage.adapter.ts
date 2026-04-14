@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { readFileSync } from 'node:fs';
-import { INpmPackage } from '@context/appInfo/application/interfaces/npmPackage.interface';
-import { IGetNpmPackagePort } from '@context/appInfo/application/ports/getNpmPackage.port';
+import { INpmPackage } from '@context/serviceInfo/application/interfaces/npmPackage.interface';
+import { IGetNpmPackagePort } from '@context/serviceInfo/application/ports/getNpmPackage.port';
 import { join } from 'node:path';
 
 @Injectable()

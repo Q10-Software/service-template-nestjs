@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
-import { AppInfoModule } from './appInfo/appInfo.module';
+import { ServiceInfoModule } from './serviceInfo/serviceInfo.module';
 import { HealthModule } from './health/health.module';
 import { ApiConfigModule } from '../config/config.module';
 import { LoggingModule } from './logging/logging.module';
@@ -32,7 +32,7 @@ import { LoggerConfig } from 'src/api/config/config.types';
       },
       inject: [ConfigService],
     }),
-    AppInfoModule,
+    ServiceInfoModule,
     HealthModule,
   ],
   providers: [

@@ -1,12 +1,12 @@
 import { IsDate, IsIn, IsNotEmpty, IsString } from 'class-validator';
 
-export class GetAppInfoDto {
+export class GetServiceInfoDto {
   @IsNotEmpty()
   @IsIn(['ok'])
   status!: 'ok';
 
   @IsString()
-  serviceName!: string;
+  name!: string;
 
   @IsString()
   version!: string;

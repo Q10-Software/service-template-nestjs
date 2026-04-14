@@ -1,18 +1,18 @@
-import { AppInfoAggregate } from '../../domain/aggregates/appInfo.aggregate';
+import { ServiceInfoAggregate } from '../../domain/aggregates/serviceInfo.aggregate';
 import { IGetNpmPackagePort } from '../ports/getNpmPackage.port';
-import { GetAppInfoOutput } from './getAppInfo.output';
+import { GetServiceInfoOutput } from './getServiceInfo.output';
 
-export class GetAppInfoUseCase {
+export class GetServiceInfoUseCase {
   private readonly startedAt: Date;
 
   constructor(private readonly getNpmPackagePort: IGetNpmPackagePort) {
     this.startedAt = new Date();
   }
 
-  execute(): GetAppInfoOutput {
+  execute(): GetServiceInfoOutput {
     const npmPackage = this.getNpmPackagePort.execute();
 
-    const appInfo = AppInfoAggregate.create({
+    const serviceInfo = ServiceInfoAggregate.create({
       status: 'ok',
       name: npmPackage.name,
       version: npmPackage.version,
@@ -20,10 +20,10 @@ export class GetAppInfoUseCase {
     });
 
     return {
-      status: appInfo.status,
-      serviceName: appInfo.name,
-      version: appInfo.version,
-      startedAt: appInfo.startedAt,
+      status: serviceInfo.status,
+      name: serviceInfo.name,
+      version: serviceInfo.version,
+      startedAt: serviceInfo.startedAt,
     };
   }
 }
