@@ -19,7 +19,9 @@ import { GetPetByIdUseCase } from '@context/pets/application/useCases/getPetById
 import { ListPetsUseCase } from '@context/pets/application/useCases/listPets.useCase';
 import { UpdatePetUseCase } from '@context/pets/application/useCases/updatePet.useCase';
 
+import { UseInterceptors } from '@nestjs/common';
 import { CreatePetBodyDto, PetResponseDto, UpdatePetBodyDto } from './pets.dto';
+import { CacheKey, CacheTTL, CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('pets')
 @UsePipes(
@@ -29,6 +31,7 @@ import { CreatePetBodyDto, PetResponseDto, UpdatePetBodyDto } from './pets.dto';
     transformOptions: { enableImplicitConversion: true },
   }),
 )
+@UseInterceptors(CacheInterceptor)
 export class PetsController {
   constructor(
     private readonly createPetUseCase: CreatePetUseCase,
@@ -56,6 +59,8 @@ export class PetsController {
   }
 
   @Get()
+  @CacheKey('PETS')
+  @CacheTTL(60 * 60 * 24)
   findAll(): PetResponseDto[] {
     const pets = this.listPetsUseCase.execute();
     return pets.map((pet) => ({

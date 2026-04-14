@@ -8,13 +8,29 @@ import { RequestLoggingMiddleware } from './logging/requestLogging.middleware';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 import { ConfigService } from '@nestjs/config';
-import { LoggerConfig } from 'src/api/config/config.types';
 import { ServiceInfoModule } from './serviceInfo/serviceInfo.module';
+import { CacheConfig, LoggerConfig } from 'src/api/config/config.types';
+import { CacheModule } from '@nestjs/cache-manager';
+import KeyvRedis from '@keyv/redis';
 
 @Module({
   imports: [
-    SentryModule.forRoot(),
     ApiConfigModule,
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ApiConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const cacheConfig = configService.getOrThrow<CacheConfig>('cache');
+
+        return {
+          stores: cacheConfig.redisUrl
+            ? [new KeyvRedis(cacheConfig.redisUrl)]
+            : undefined,
+        };
+      },
+    }),
+    SentryModule.forRoot(),
     LoggingModule.forRootAsync({
       imports: [ApiConfigModule],
       useFactory: (configService: ConfigService) => {
