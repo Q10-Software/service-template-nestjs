@@ -1,10 +1,10 @@
-import './instrument';
+import '../instrument';
 
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { AppModule } from './api/modules/app.module';
-import { HttpConfig } from './api/config/config.types';
-import { LoggerService } from './api/modules/logging/logger.service';
+import { AppModule } from './modules/app.module';
+import { HttpConfig } from './config/config.types';
+import { LoggerService } from './modules/logging/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
