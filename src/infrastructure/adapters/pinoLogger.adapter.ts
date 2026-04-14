@@ -2,7 +2,7 @@ import pino, { Logger as PinoLogger } from 'pino';
 import {
   IAppLoggerPort,
   LogContext,
-} from '../../contexts/_shared/application/ports/logger.port';
+} from '@shared/application/ports/logger.port';
 import * as Sentry from '@sentry/nestjs';
 
 export interface BuildPinoLoggerOptions {
