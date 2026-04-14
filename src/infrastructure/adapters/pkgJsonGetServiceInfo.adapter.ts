@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { readFileSync } from 'node:fs';
 import { GetServiceInfoPortOutput } from '@context/serviceInfo/application/interfaces/getServiceInfoPortOutput.interface';
 import { GetServiceInfoPort } from '@context/serviceInfo/application/ports/getServiceInfo.port';
-import { join } from 'node:path';
 import { GetPackageJsonDataService } from '@infrastructure/services/getPackageJsonData.service';
 
 @Injectable()
