@@ -6,13 +6,14 @@ import {
 import * as Sentry from '@sentry/nestjs';
 
 export interface BuildPinoLoggerOptions {
-  service: string;
+  serviceName: string;
   environment: string;
-  version?: string;
+  serviceVersion: string;
   level: string;
   pretty: boolean;
-  includeStack: boolean;
+  includeStack?: boolean;
   redactPaths: string[];
+  context?: string;
 }
 
 export class PinoLoggerAdapter implements IAppLoggerPort {
@@ -22,6 +23,7 @@ export class PinoLoggerAdapter implements IAppLoggerPort {
     private readonly options: BuildPinoLoggerOptions,
     private readonly includeStack: boolean,
   ) {
+    this.options = options;
     this.logger = this.build(options);
   }
 
@@ -38,13 +40,15 @@ export class PinoLoggerAdapter implements IAppLoggerPort {
   }
 
   info(message: string, context?: LogContext): void {
-    this.logger.info(this.toPayload(context), message);
-    Sentry.logger.info(message, { context: this.toPayload(context) });
+    const payload = this.toPayload(context);
+    this.logger.info(payload, message);
+    Sentry.logger.info(message, { context: payload });
   }
-
+  
   log(message: string, context?: LogContext): void {
-    this.logger.info(this.toPayload(context), message);
-    Sentry.logger.info(message, { context: this.toPayload(context) });
+    const payload = this.toPayload(context);
+    this.logger.info(payload, message);
+    Sentry.logger.info(message, { context: payload });
   }
 
   debug(message: string, context?: LogContext): void {
@@ -55,9 +59,22 @@ export class PinoLoggerAdapter implements IAppLoggerPort {
     this.logger.trace(this.toPayload(context), message);
   }
 
-  private toPayload(context?: LogContext): Record<string, unknown> {
+  setContext(context: string): IAppLoggerPort {
+    return new PinoLoggerAdapter({
+      ...this.options,
+      context,
+    }, this.includeStack);
+  }
+
+  private toPayload(context?: LogContext | string): Record<string, unknown> {
     if (!context) {
       return {};
+    }
+
+    if (typeof context === 'string') {
+      context = {
+        context,
+      };
     }
 
     const error = context.error
@@ -65,22 +82,23 @@ export class PinoLoggerAdapter implements IAppLoggerPort {
           name: context.error.name,
           message: context.error.message,
           stack: this.includeStack ? context.error.stack : undefined,
+          context: context.context,
         }
       : undefined;
 
     return {
       event: context.event,
       context: context.context,
-      request_id: context.requestId,
-      trace_id: context.traceId,
-      span_id: context.spanId,
-      user_id: context.userId,
+      requestId: context.requestId,
+      traceId: context.traceId,
+      spanId: context.spanId,
+      userId: context.userId,
       http: context.http
         ? {
             method: context.http.method,
             route: context.http.route,
-            status_code: context.http.statusCode,
-            latency_ms: context.http.latencyMs,
+            statusCode: context.http.statusCode,
+            latencyMs: context.http.latencyMs,
           }
         : undefined,
       error,
@@ -92,9 +110,11 @@ export class PinoLoggerAdapter implements IAppLoggerPort {
     return pino({
       level: options.level,
       base: {
-        service: options.service,
+        serviceName: options.serviceName ?? 'unknown',
         environment: options.environment,
-        version: options.version ?? '0.0.0',
+        version: '0.0.1',
+        serviceVersion: options.serviceVersion ?? 'unknown',
+        context: options.context,
       },
       redact: {
         paths: options.redactPaths,

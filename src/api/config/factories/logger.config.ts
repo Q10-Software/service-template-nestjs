@@ -19,9 +19,9 @@ export default registerAs('logger', () => {
   const defaultLevel = debug ? 'debug' : 'info';
 
   return {
-    service: process.env.APP_NAME ?? 'app',
+    serviceName: process.env.SERVICE_NAME ?? 'unknown',
     environment,
-    version: process.env.APP_VERSION,
+    serviceVersion: process.env.SERVICE_VERSION ?? 'unknown',
     level: process.env.LOG_LEVEL ?? defaultLevel,
     pretty: toBoolean(process.env.LOG_PRETTY, environment !== 'production'),
     includeStack: toBoolean(

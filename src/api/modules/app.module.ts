@@ -22,12 +22,12 @@ import { LoggerConfig } from 'src/api/config/config.types';
         return {
           global: true,
           includeStack: false,
-          service: config.service,
-          environment: config?.environment,
-          version: config?.version,
-          level: config?.level,
-          pretty: config?.pretty,
-          redactPaths: config?.redactPaths,
+          serviceName: config.serviceName,
+          environment: config.environment,
+          serviceVersion: config.serviceVersion,
+          level: config.level,
+          pretty: config.pretty,
+          redactPaths: config.redactPaths,
         };
       },
       inject: [ConfigService],

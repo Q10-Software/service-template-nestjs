@@ -1,5 +1,3 @@
-export const APP_LOGGER_PORT = Symbol('APP_LOGGER_PORT');
-
 export type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
 
 export interface HttpLogContext {
@@ -35,4 +33,5 @@ export interface IAppLoggerPort {
   info(message: string, context?: LogContext): void;
   debug(message: string, context?: LogContext): void;
   trace(message: string, context?: LogContext): void;
+  setContext(context: string): IAppLoggerPort;
 }

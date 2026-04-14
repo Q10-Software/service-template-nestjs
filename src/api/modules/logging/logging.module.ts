@@ -1,21 +1,16 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { APP_LOGGER_PORT } from '../../../contexts/_shared/application/ports/logger.port';
-import {
-  BuildPinoLoggerOptions,
-  PinoLoggerAdapter,
-} from '../../../infrastructure/adapters/pinoLogger.adapter';
+import { BuildPinoLoggerOptions } from '../../../infrastructure/adapters/pinoLogger.adapter';
 import { LoggerService } from './logger.service';
-import { normalizeLoggerConfig } from './loggingConfig.utils';
 import { RequestLoggingMiddleware } from './requestLogging.middleware';
 
 export interface LoggerModuleOptions extends BuildPinoLoggerOptions {
-  service: string;
   global: boolean;
   includeStack: boolean;
 }
 
 export interface LoggerModuleAsyncOptions {
   useFactory: (...args: any[]) => LoggerModuleOptions;
+  global?: boolean;
   inject: any[];
   imports: any[];
 }
@@ -32,14 +27,14 @@ export class LoggingModule {
     return {
       imports: options.imports,
       module: LoggingModule,
+      global: options.global ?? true,
       providers: [
         loggerOptionsProvider,
         RequestLoggingMiddleware,
         {
           provide: LoggerService,
           useFactory: (options: LoggerModuleOptions) => {
-            const loggerConfig = normalizeLoggerConfig(options);
-            return new LoggerService(loggerConfig, options.includeStack);
+            return new LoggerService(options, options.includeStack);
           },
           inject: ['LOGGER_OPTIONS'],
         },

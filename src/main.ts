@@ -15,7 +15,7 @@ async function bootstrap() {
 
   app.useLogger(loggerService);
 
-  await app.listen(httpConfig.port);
+  return app.listen(httpConfig.port);
 }
 
 void bootstrap().catch((error) => {
