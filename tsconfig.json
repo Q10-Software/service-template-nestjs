@@ -17,7 +17,8 @@
     "paths": {
       "@context/*": ["src/contexts/*"],
       "@infrastructure/*": ["src/infrastructure/*"],
-      "@shared/*": ["src/_shared/*"]
+      "@shared/*": ["src/_shared/*"],
+      "@api/*": ["src/api/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
