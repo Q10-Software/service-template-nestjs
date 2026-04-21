@@ -16,7 +16,9 @@
     "baseUrl": "./",
     "paths": {
       "@context/*": ["src/contexts/*"],
-      "@infrastructure/*": ["src/infrastructure/*"]
+      "@infrastructure/*": ["src/infrastructure/*"],
+      "@shared/*": ["src/_shared/*"],
+      "@api/*": ["src/api/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
