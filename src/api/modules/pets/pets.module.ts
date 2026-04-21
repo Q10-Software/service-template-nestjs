@@ -10,6 +10,7 @@ import { PetMemoryRepository } from '@infrastructure/persistence/pets/petMemory.
 import { PetsController } from './pets.controller';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ICache } from '@infrastructure/interfaces/cache.interface';
+import { CacheInvalidateInterceptor } from '../../interceptors/cacheInvalidate.interceptor';
 
 @Module({
   controllers: [PetsController],
@@ -44,6 +45,7 @@ import { ICache } from '@infrastructure/interfaces/cache.interface';
       useFactory: (repo: PetMemoryRepository) => new DeletePetUseCase(repo),
       inject: [PetMemoryRepository],
     },
+    CacheInvalidateInterceptor,
   ],
 })
 export class PetsModule {}

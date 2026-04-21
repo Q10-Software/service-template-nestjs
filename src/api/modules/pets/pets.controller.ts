@@ -2,15 +2,14 @@ import {
   Body,
   Controller,
   Delete,
+  ExecutionContext,
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Put,
-  UsePipes,
-  ValidationPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { CreatePetUseCase } from '@context/pets/application/useCases/createPet.useCase';
@@ -18,21 +17,16 @@ import { DeletePetUseCase } from '@context/pets/application/useCases/deletePet.u
 import { GetPetByIdUseCase } from '@context/pets/application/useCases/getPetById.useCase';
 import { ListPetsUseCase } from '@context/pets/application/useCases/listPets.useCase';
 import { UpdatePetUseCase } from '@context/pets/application/useCases/updatePet.useCase';
+import { Result } from '@shared/domain/result/result';
+import { ConflictError, NotFoundError } from '@shared/domain/errors/baseErrors';
 
-import { UseInterceptors } from '@nestjs/common';
 import { CreatePetBodyDto, PetResponseDto, UpdatePetBodyDto } from './pets.dto';
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import { NotFoundError } from '@shared/domain/errors/baseErrors';
+import { ResultCacheInterceptor } from '../../interceptors/resultCache.interceptor';
+import { CacheInvalidate } from '../../decorators/cacheInvalidate.decorator';
+import { CacheInvalidateInterceptor } from '../../interceptors/cacheInvalidate.interceptor';
 
 @Controller('pets')
-@UsePipes(
-  new ValidationPipe({
-    whitelist: true,
-    transform: true,
-    transformOptions: { enableImplicitConversion: true },
-  }),
-)
-@UseInterceptors(CacheInterceptor)
+@UseInterceptors(ResultCacheInterceptor, CacheInvalidateInterceptor)
 export class PetsController {
   constructor(
     private readonly createPetUseCase: CreatePetUseCase,
@@ -43,66 +37,40 @@ export class PetsController {
   ) {}
 
   @Post()
-  async create(@Body() body: CreatePetBodyDto): Promise<PetResponseDto> {
-    const result = await this.createPetUseCase.execute({
-      name: body.name,
-      birthDate: body.birthDate,
-      breed: body.breed,
-    });
-    return {
-      id: result.id,
-      name: result.name,
-      birthDate: result.birthDate,
-      breed: result.breed,
-      createdAt: result.createdAt,
-      updatedAt: result.updatedAt,
-    };
+  @CacheInvalidate('/pets')
+  create(@Body() body: CreatePetBodyDto): Promise<Result<PetResponseDto, ConflictError>> {
+    return this.createPetUseCase.execute(body);
   }
 
   @Get()
-  async findAll(): Promise<PetResponseDto[]> {
-    const pets = await this.listPetsUseCase.execute();
-    return pets.map((pet) => ({
-      id: pet.id,
-      name: pet.name,
-      birthDate: pet.birthDate,
-      breed: pet.breed,
-      createdAt: pet.createdAt,
-      updatedAt: pet.updatedAt,
-    }));
+  findAll(): Promise<Result<PetResponseDto[], never>> {
+    return this.listPetsUseCase.execute();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<PetResponseDto> {
-    const pet = await this.getPetByIdUseCase.execute({ id });
-
-    if (pet instanceof NotFoundError) {
-      throw new NotFoundException(pet.message);
-    }
-
-    return pet;
+  findOne(@Param('id') id: string): Promise<Result<PetResponseDto, NotFoundError>> {
+    return this.getPetByIdUseCase.execute({ id });
   }
 
   @Put(':id')
-  async update(
+  @CacheInvalidate(
+    '/pets',
+    (ctx: ExecutionContext) => `/pets/${ctx.switchToHttp().getRequest<{ params: { id: string } }>().params.id}`,
+  )
+  update(
     @Param('id') id: string,
     @Body() body: UpdatePetBodyDto,
-  ): Promise<PetResponseDto> {
-    const pet = await this.updatePetUseCase.execute({ id, ...body });
-
-    if (!pet) {
-      throw new NotFoundException(`Pet with id ${id} not found`);
-    }
-
-    return pet;
+  ): Promise<Result<PetResponseDto, NotFoundError>> {
+    return this.updatePetUseCase.execute({ id, ...body });
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string): void {
-    const deleted = this.deletePetUseCase.execute({ id });
-    if (!deleted) {
-      throw new NotFoundException(`Pet with id ${id} not found`);
-    }
+  @CacheInvalidate(
+    '/pets',
+    (ctx: ExecutionContext) => `/pets/${ctx.switchToHttp().getRequest<{ params: { id: string } }>().params.id}`,
+  )
+  remove(@Param('id') id: string): Promise<Result<void, NotFoundError>> {
+    return this.deletePetUseCase.execute({ id });
   }
 }
