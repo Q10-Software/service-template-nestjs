@@ -3,10 +3,8 @@ import { GetServiceInfoUseCase } from '@context/serviceInfo/application/useCases
 import { GetServiceInfoMapper } from './serviceInfo.mapper';
 import { GetServiceInfoDto } from './serviceInfo.dto';
 import { LoggerService } from '../logging/logger.service';
-// import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller()
-// @UseInterceptors(CacheInterceptor)
 export class ServiceInfoController {
   constructor(
     private readonly getServiceInfoUseCase: GetServiceInfoUseCase,
@@ -16,8 +14,6 @@ export class ServiceInfoController {
     this.logger = this.logger.setContext(this.constructor.name);
   }
 
-  // @CacheKey('SERVICE_INFO')
-  // @CacheTTL(60 * 60 * 24)
   @Get('info')
   execute(): GetServiceInfoDto {
     const serviceInfo = this.getServiceInfoUseCase.execute();

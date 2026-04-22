@@ -5,7 +5,9 @@ import {
   HealthCheckService,
   MemoryHealthIndicator,
 } from '@nestjs/terminus';
+import { SkipResponseWrap } from '../../decorators/skipResponseWrap.decorator';
 
+@SkipResponseWrap()
 @Controller()
 export class HealthController {
   constructor(

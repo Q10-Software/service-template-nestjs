@@ -1,5 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { ResponseWrapperInterceptor } from '../interceptors/responseWrapper.interceptor';
+import { ResultInterceptor } from '../interceptors/result.interceptor';
 import { ServiceInfoModule } from './serviceInfo/serviceInfo.module';
 import { HealthModule } from './health/health.module';
 import { ApiConfigModule } from '../config/config.module';
@@ -15,6 +17,7 @@ import { LoggerConfig } from 'src/api/config/config.types';
     SentryModule.forRoot(),
     ApiConfigModule,
     LoggingModule.forRootAsync({
+      global: true,
       imports: [ApiConfigModule],
       useFactory: (configService: ConfigService) => {
         const config = configService.getOrThrow<LoggerConfig>('logger');
@@ -39,6 +42,14 @@ import { LoggerConfig } from 'src/api/config/config.types';
     {
       provide: APP_FILTER,
       useClass: SentryGlobalFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseWrapperInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResultInterceptor,
     },
   ],
 })
