@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   type BuildPinoLoggerOptions,
   PinoLoggerAdapter,
-} from 'src/infrastructure/adapters/pinoLogger.adapter';
+} from '@shared/infrastructure/adapters/pinoLogger.adapter';
 
 
 @Injectable()

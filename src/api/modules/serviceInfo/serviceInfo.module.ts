@@ -6,8 +6,8 @@ import {
 } from '@context/serviceInfo/application/ports/getServiceInfo.port';
 import { ServiceInfoController } from './serviceInfo.controller';
 import { GetServiceInfoMapper } from './serviceInfo.mapper';
-import { PkgJsonGetServiceInfoAdapter } from '../../../infrastructure/adapters/pkgJsonGetServiceInfo.adapter';
-import { GetPackageJsonDataService } from '@infrastructure/services/getPackageJsonData.service';
+import { PkgJsonGetServiceInfoAdapter } from '@infrastructure/serviceInfo/adapters/pkgJsonGetServiceInfo.adapter';
+import { GetPackageJsonDataService } from '@infrastructure/serviceInfo/services/getPackageJsonData.service';
 
 @Module({
   controllers: [ServiceInfoController],

@@ -1,5 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { BuildPinoLoggerOptions } from '../../../infrastructure/adapters/pinoLogger.adapter';
+import { BuildPinoLoggerOptions } from '@shared/infrastructure/adapters/pinoLogger.adapter';
 import { LoggerService } from './logger.service';
 import { RequestLoggingMiddleware } from './requestLogging.middleware';
 
