@@ -1,21 +1,27 @@
-import { ConflictError, NotFoundError, ValidationError } from "./baseErrors";
+import {
+  ConflictError,
+  NotFoundError,
+  UnknownError,
+  ValidationError,
+  ValidationErrorDetail,
+} from './baseErrors';
 
 export class DomainErrorFactory {
-  public readonly context: string;
+  constructor(private readonly context: string) {}
 
-  constructor(context: string) {
-    this.context = context;
+  notFound(message: string, origin: string, attributes?: Record<string, unknown>) {
+    return new NotFoundError({ context: this.context, origin, message, attributes });
   }
 
-  notFound(message: string, attributes?: Record<string, unknown>) {
-    return new NotFoundError({ context: this.context, message, attributes });
+  conflict(message: string, origin: string, attributes?: Record<string, unknown>) {
+    return new ConflictError({ context: this.context, origin, message, attributes });
   }
 
-  conflict(message: string, attributes?: Record<string, unknown>) {
-    return new ConflictError({ context: this.context, message, attributes });
+  validation(message: string, origin: string, details: ValidationErrorDetail[] = [], attributes?: Record<string, unknown>) {
+    return new ValidationError({ context: this.context, origin, message, attributes }, details);
   }
 
-  validation(message: string, attributes?: Record<string, unknown>) {
-    return new ValidationError({ context: this.context, message, attributes });
+  unknown(message: string, origin: string, attributes?: Record<string, unknown>) {
+    return new UnknownError({ context: this.context, origin, message, attributes });
   }
 }

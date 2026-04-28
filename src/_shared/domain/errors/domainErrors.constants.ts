@@ -1,9 +1,8 @@
-export const DOMAIN_ERROR_CODES = {
-    NOT_FOUND: 'NOT_FOUND',
-    CONFLICT: 'CONFLICT',
-    VALIDATION: 'VALIDATION',
-    UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-  } as const;
-  
-  export type DOMAIN_ERROR_CODES = typeof DOMAIN_ERROR_CODES[keyof typeof DOMAIN_ERROR_CODES];
-  
+export const DomainErrorType = {
+  NOT_FOUND: 'NOT_FOUND',
+  CONFLICT: 'CONFLICT',
+  VALIDATION: 'VALIDATION',
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export type DomainErrorType = typeof DomainErrorType[keyof typeof DomainErrorType];
