@@ -1,8 +1,9 @@
+import { UseCase } from '@shared/application/useCases/useCase.interface';
 import { ServiceInfoAggregate } from '../../domain/aggregates/serviceInfo.aggregate';
 import { GetServiceInfoPort } from '../ports/getServiceInfo.port';
 import { GetServiceInfoOutput } from './getServiceInfo.output';
 
-export class GetServiceInfoUseCase {
+export class GetServiceInfoUseCase implements UseCase<void, GetServiceInfoOutput> {
   private readonly startedAt: Date;
 
   constructor(private readonly getServiceInfoPort: GetServiceInfoPort) {

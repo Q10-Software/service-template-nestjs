@@ -1,14 +1,10 @@
+import { Aggregate } from '@shared/domain/aggregates/aggregate';
 import {
   CreateServiceInfoProps,
   IServiceInfo,
 } from '../entities/serviceInfo.entity';
 
-export class ServiceInfoAggregate {
-  private readonly _entity: IServiceInfo;
-
-  constructor(entity: IServiceInfo) {
-    this._entity = entity;
-  }
+export class ServiceInfoAggregate extends Aggregate<IServiceInfo> {
 
   get status(): IServiceInfo['status'] {
     return this._entity.status;
