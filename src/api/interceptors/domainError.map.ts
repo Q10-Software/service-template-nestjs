@@ -22,9 +22,7 @@ const DOMAIN_ERROR_TO_HTTP_EXCEPTION: Record<
 export interface DomainErrorHttpBody extends Record<string, unknown> {
   type: DomainErrorType;
   code: string;
-  context: string;
   message: string;
-  attributes?: Record<string, unknown>;
   details?: ValidationErrorDetail[];
 }
 
@@ -34,10 +32,8 @@ export function domainErrorToHttpException(error: DomainError): HttpException {
   const body: DomainErrorHttpBody = {
     type: error.type,
     code: error.code,
-    context: error.context,
     message: error.message,
     details: error instanceof ValidationError ? error.details : undefined,
-    ...(error.attributes && { attributes: error.attributes }),
   };
 
   return new ExceptionClass(body);

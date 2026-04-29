@@ -5,13 +5,9 @@ import { GetPackageJsonDataService } from '../services/getPackageJsonData.servic
 
 @Injectable()
 export class PkgJsonGetServiceInfoAdapter implements GetServiceInfoPort {
-  private readonly serviceInfoData: GetServiceInfoPortOutput;
-
-  constructor(private readonly getPackageJsonDataService: GetPackageJsonDataService) {
-    this.serviceInfoData = this.getPackageJsonDataService.execute();
-  }
+  constructor(private readonly getPackageJsonDataService: GetPackageJsonDataService) {}
 
   execute(): GetServiceInfoPortOutput {
-    return this.serviceInfoData;
+    return this.getPackageJsonDataService.execute();
   }
 }

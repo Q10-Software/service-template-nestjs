@@ -46,7 +46,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
         body: {
           type: DomainErrorType.UNKNOWN,
           code: `INTERNAL.${DomainErrorType.UNKNOWN}`,
-          context: 'INTERNAL',
           message: 'Internal server error',
         },
       };
@@ -64,7 +63,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       body: {
         type: DomainErrorType.UNKNOWN,
         code: `HTTP.${DomainErrorType.UNKNOWN}`,
-        context: 'HTTP',
         message: exception.message,
       },
     };
@@ -76,8 +74,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       body !== null &&
       'type' in body &&
       'code' in body &&
-      'context' in body &&
-      'origin' in body &&
       'message' in body
     );
   }

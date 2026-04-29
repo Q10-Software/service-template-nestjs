@@ -12,7 +12,7 @@ export class DomainError extends Error {
   constructor(props: DomainErrorProps) {
     super(props.message);
     this.type = props.type;
-    this.code = `${props.context}.${props.type}`;
+    this.code = props.code;
     this.context = props.context;
     this.origin = props.origin;
     this.message = props.message;

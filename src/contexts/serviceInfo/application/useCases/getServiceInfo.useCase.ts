@@ -2,15 +2,17 @@ import { UseCase } from '@shared/application/useCases/useCase.interface';
 import { ServiceInfoAggregate } from '../../domain/aggregates/serviceInfo.aggregate';
 import { GetServiceInfoPort } from '../ports/getServiceInfo.port';
 import { GetServiceInfoOutput } from './getServiceInfo.output';
+import { Result } from '@shared/domain/result/result';
+import { DomainError } from '@shared/domain/errors/domainError';
 
-export class GetServiceInfoUseCase implements UseCase<void, GetServiceInfoOutput> {
+export class GetServiceInfoUseCase implements UseCase<undefined, GetServiceInfoOutput> {
   private readonly startedAt: Date;
 
   constructor(private readonly getServiceInfoPort: GetServiceInfoPort) {
     this.startedAt = new Date();
   }
 
-  execute(): GetServiceInfoOutput {
+  execute(): Result<GetServiceInfoOutput, DomainError> {
     const serviceInfo = this.getServiceInfoPort.execute();
 
     const aServiceInfo = ServiceInfoAggregate.create({
@@ -20,11 +22,11 @@ export class GetServiceInfoUseCase implements UseCase<void, GetServiceInfoOutput
       startedAt: this.startedAt,
     });
 
-    return {
+    return Result.ok({
       status: aServiceInfo.status,
       name: aServiceInfo.name,
       version: aServiceInfo.version,
       startedAt: aServiceInfo.startedAt,
-    };
+    });
   }
 }
