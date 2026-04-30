@@ -1,99 +1,291 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS DDD Service Template
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A production-ready NestJS template built around **Domain-Driven Design (DDD)** and **Clean Architecture** principles. It provides a structured foundation for building scalable, maintainable microservices in TypeScript with opinionated patterns for error handling, caching, validation, logging, and observability.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Domain-Driven Design** — Bounded contexts, aggregates, entities, value objects, and repository abstractions
+- **Result Pattern** — Functional error handling using `Result<T, E>` instead of exceptions throughout the domain layer
+- **Caching** — Redis-backed cache with custom `@CacheInvalidate()` decorator for automatic cache busting
+- **Validation** — DTO validation via `class-validator`, environment schema via `joi`, and value-object-level guards
+- **Structured Logging** — Pino logger with redaction, pretty-print, and log levels configurable per environment
+- **Observability** — Sentry integration for error tracking/tracing, OpenTelemetry support
+- **Health Checks** — `/health` endpoint via `@nestjs/terminus`
+- **Standardized Responses** — Global response wrapper interceptor with opt-out via `@SkipResponseWrap()`
 
-## Project setup
+---
 
-```bash
-$ npm install
-$ cp .env.example .env
+## Project Structure
+
+```
+src/
+├── _shared/                        # Shared DDD building blocks
+│   ├── application/
+│   │   ├── ports/                  # Logger port (abstraction)
+│   │   └── useCases/               # UseCase & AsyncUseCase interfaces
+│   ├── domain/
+│   │   ├── aggregates/             # Base Aggregate & RootAggregate classes
+│   │   ├── errors/                 # DomainError base class and factory helpers
+│   │   ├── repositories/           # Generic IRootRepository interface
+│   │   ├── result/                 # Result<T, E> type
+│   │   └── valueObjects/           # Base ValueObject class
+│   └── infrastructure/
+│       ├── adapters/               # Pino logger adapter
+│       └── persistence/            # Generic in-memory repository base
+│
+├── api/                            # NestJS HTTP layer
+│   ├── config/                     # App/HTTP/cache/logger factories + Joi env validation
+│   ├── decorators/                 # @CacheInvalidate, @SkipResponseWrap
+│   ├── filters/                    # AllExceptionsFilter
+│   ├── interceptors/               # ResultCacheInterceptor, CacheInvalidateInterceptor, ResponseWrapperInterceptor
+│   └── modules/                    # Feature modules (app, pets, health, logging, serviceInfo)
+│
+├── contexts/                       # Bounded contexts (business logic lives here)
+│   └── pets/
+│       ├── application/useCases/   # CreatePet, GetPetById, ListPets, UpdatePet, DeletePet
+│       └── domain/
+│           ├── aggregates/         # PetAggregate
+│           ├── errors/             # Pet-specific DomainErrors
+│           ├── repositories/       # IPetRepository interface
+│           └── valueObjects/       # PetName, PetBirthDate, PetBreed
+│
+└── infrastructure/                 # Infrastructure implementations
+    └── persistence/pets/           # PetMemoryRepository
 ```
 
-## Compile and run the project
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 20
+- npm >= 10
+- Redis (optional — required only for cache to persist; falls back gracefully in dev)
+
+### Installation
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
+cp .env.example .env
 ```
 
-## Run tests
+### Running the Application
 
 ```bash
-# unit tests
-$ npm run test
+# Development
+npm run start
 
-# e2e tests
-$ npm run test:e2e
+# Development with watch mode
+npm run start:dev
 
-# test coverage
-$ npm run test:cov
+# Production
+npm run start:prod
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Running Tests
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Unit tests
+npm run test
+
+# End-to-end tests
+npm run test:e2e
+
+# Test coverage
+npm run test:cov
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## Configuration
 
-Check out a few resources that may come in handy when working with NestJS:
+All configuration is driven by environment variables. Copy `.env.example` to `.env` and adjust as needed:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Variable | Description | Default |
+|---|---|---|
+| `NODE_ENV` | Environment (`development`, `production`) | `development` |
+| `APP_NAME` | Service name used in logs and responses | — |
+| `APP_VERSION` | Service version | — |
+| `PORT` | HTTP port | `3000` |
+| `LOG_LEVEL` | Pino log level (`debug`, `info`, `warn`, `error`) | `info` |
+| `LOG_PRETTY` | Enable pretty-print logging | `false` |
+| `LOG_INCLUDE_STACK` | Include stack traces in logs | `false` |
+| `LOG_REDACT_PATHS` | Comma-separated paths to redact from logs | — |
+| `SENTRY_DSN` | Sentry project DSN for error tracking | — |
+| `SENTRY_TRACES_SAMPLE_RATE` | Sentry tracing sample rate (0–1) | `1` |
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Usage Examples
 
-## Stay in touch
+### Defining a Value Object
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Value objects validate their own invariants. An invalid value returns an `Err` result rather than throwing.
+
+```typescript
+// src/contexts/pets/domain/valueObjects/PetName.ts
+import { ValueObject } from '@shared/domain/valueObjects/ValueObject';
+import { Result, Ok, Err } from '@shared/domain/result/Result';
+
+export class PetName extends ValueObject<string> {
+  static create(value: string): Result<PetName, DomainError> {
+    if (!value || value.trim().length === 0) {
+      return Err(petsErrors.invalidName('Name cannot be empty'));
+    }
+    if (value.length > 100) {
+      return Err(petsErrors.invalidName('Name cannot exceed 100 characters'));
+    }
+    return Ok(new PetName(value.trim()));
+  }
+}
+```
+
+### Defining an Aggregate
+
+Aggregates are the entry points for domain business logic. The `create` factory method validates all inputs and returns a `Result`.
+
+```typescript
+// src/contexts/pets/domain/aggregates/PetAggregate.ts
+export class PetAggregate extends RootAggregate<IPet> {
+  static create(props: CreatePetProps): Result<PetAggregate, DomainError> {
+    const nameResult = PetName.create(props.name);
+    if (nameResult.isErr()) return Err(nameResult.error);
+
+    const birthDateResult = PetBirthDate.create(props.birthDate);
+    if (birthDateResult.isErr()) return Err(birthDateResult.error);
+
+    return Ok(new PetAggregate({
+      id: uuid(),
+      name: nameResult.value,
+      birthDate: birthDateResult.value,
+      breed: props.breed,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+  }
+}
+```
+
+### Implementing a Use Case
+
+Use cases orchestrate domain logic and infrastructure. They consume a repository and return a `Result`.
+
+```typescript
+// src/contexts/pets/application/useCases/CreatePetUseCase.ts
+@Injectable()
+export class CreatePetUseCase implements AsyncUseCase<CreatePetDto, Result<PetAggregate, DomainError>> {
+  constructor(
+    @Inject(PET_REPOSITORY) private readonly petRepository: IPetRepository,
+  ) {}
+
+  async execute(dto: CreatePetDto): Promise<Result<PetAggregate, DomainError>> {
+    const petResult = PetAggregate.create(dto);
+    if (petResult.isErr()) return Err(petResult.error);
+
+    await this.petRepository.save(petResult.value);
+    return Ok(petResult.value);
+  }
+}
+```
+
+### Creating a Controller
+
+Controllers call use cases and return `Result` values. The `AllExceptionsFilter` and `ResponseWrapperInterceptor` handle the rest.
+
+```typescript
+// src/api/modules/pets/PetsController.ts
+@Controller('pets')
+@UseInterceptors(ResultCacheInterceptor, CacheInvalidateInterceptor)
+export class PetsController {
+  constructor(private readonly createPet: CreatePetUseCase) {}
+
+  @Post()
+  @CacheInvalidate('/pets')
+  async create(@Body() body: CreatePetBodyDto) {
+    return this.createPet.execute(body);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.getPetById.execute({ id });
+  }
+}
+```
+
+---
+
+## API Endpoints
+
+The template ships with a fully functional **Pets** example that demonstrates all DDD layers end-to-end.
+
+| Method | Path | Description | Cache |
+|---|---|---|---|
+| `POST` | `/pets` | Create a new pet | Invalidates `/pets` |
+| `GET` | `/pets` | List all pets | Cached |
+| `GET` | `/pets/:id` | Get a pet by ID | Cached |
+| `PUT` | `/pets/:id` | Update a pet | Invalidates `/pets`, `/pets/:id` |
+| `DELETE` | `/pets/:id` | Delete a pet | Invalidates `/pets`, `/pets/:id` |
+| `GET` | `/health` | Health check | — |
+
+### Example Request & Response
+
+**Create a pet:**
+```bash
+curl -X POST http://localhost:3000/pets \
+  -H "Content-Type: application/json" \
+  -d '{ "name": "Rex", "birthDate": "2020-05-10", "breed": "Labrador" }'
+```
+
+```json
+{
+  "data": {
+    "id": "a1b2c3d4-...",
+    "name": "Rex",
+    "birthDate": "2020-05-10T00:00:00.000Z",
+    "breed": "Labrador",
+    "createdAt": "2026-04-30T12:00:00.000Z",
+    "updatedAt": "2026-04-30T12:00:00.000Z"
+  },
+  "statusCode": 201
+}
+```
+
+**Validation error:**
+```json
+{
+  "statusCode": 422,
+  "error": "INVALID_PET_NAME",
+  "message": "Name cannot exceed 100 characters",
+  "context": "PetAggregate"
+}
+```
+
+---
+
+## Adding a New Bounded Context
+
+1. **Create the domain layer** under `src/contexts/<context>/domain/`:
+   - Define the entity interface
+   - Implement value objects extending `ValueObject<T>`
+   - Build the aggregate extending `RootAggregate<T>`
+   - Define domain errors using the `DomainError` factory
+   - Declare the repository interface using `IRootRepository<Aggregate>`
+
+2. **Create the application layer** under `src/contexts/<context>/application/useCases/`:
+   - Implement one use case class per operation
+   - Each implements `AsyncUseCase<Input, Result<Output, DomainError>>`
+
+3. **Create the infrastructure layer** under `src/infrastructure/persistence/<context>/`:
+   - Implement the repository interface (in-memory, TypeORM, Prisma, etc.)
+
+4. **Create the NestJS module** under `src/api/modules/<context>/`:
+   - Controller, DTOs, and the feature module wiring use cases + repository
+
+---
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+MIT
