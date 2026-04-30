@@ -1,27 +1,41 @@
 import { Controller, Get } from '@nestjs/common';
 import { GetServiceInfoUseCase } from '@context/serviceInfo/application/useCases/getServiceInfo.useCase';
-import { GetServiceInfoMapper } from './serviceInfo.mapper';
-import { GetServiceInfoDto } from './serviceInfo.dto';
+import { GetServiceInfoMapper, MapperResponse } from './serviceInfo.mapper';
 import { LoggerService } from '../logging/logger.service';
-// import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { Result } from '@shared/domain/result/result';
+import { DomainError } from '@shared/domain/errors/domainError';
+
+abstract class RootController {
+  protected readonly logger: LoggerService;
+
+  constructor(_logger: LoggerService) {
+    this.logger = _logger.setContext(this.constructor.name);
+  }
+
+  abstract _execute(): Promise<MapperResponse>;
+
+  @Get('info')
+  async execute(): Promise<Result<unknown, DomainError>> {
+    this.logger.info('Executing controller');
+    const result = await this._execute();
+    this.logger.info('Controller executed');
+    return result;
+  }
+}
 
 @Controller()
-// @UseInterceptors(CacheInterceptor)
-export class ServiceInfoController {
+export class ServiceInfoController extends RootController {
   constructor(
     private readonly getServiceInfoUseCase: GetServiceInfoUseCase,
     private readonly mapper: GetServiceInfoMapper,
-    private readonly logger: LoggerService,
+    private readonly _logger: LoggerService,
   ) {
-    this.logger = this.logger.setContext(this.constructor.name);
+    super(_logger);
   }
 
-  // @CacheKey('SERVICE_INFO')
-  // @CacheTTL(60 * 60 * 24)
-  @Get('info')
-  execute(): GetServiceInfoDto {
-    const serviceInfo = this.getServiceInfoUseCase.execute();
-    this.logger.info('Service info retrieved');
-    return this.mapper.toResponse(serviceInfo);
+  async _execute(): Promise<MapperResponse> {
+    const result = this.getServiceInfoUseCase.execute();
+    this.logger.info('Service info retrieved at ' + new Date().toISOString());
+    return this.mapper.toResponse(result);
   }
 }

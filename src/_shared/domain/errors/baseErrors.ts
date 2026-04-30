@@ -1,33 +1,43 @@
 import { DomainError } from './domainError';
 import { DomainErrorProps } from './domainError.interfaces';
-import { DOMAIN_ERROR_CODES } from './domainErrors.constants';
+import { DomainErrorType } from './domainErrors.constants';
 
-export type BaseErrorProps = Omit<DomainErrorProps, 'code'>;
+export type BaseErrorProps = Omit<DomainErrorProps, 'type'>;
+
+export interface ValidationErrorDetail {
+  property: string;
+  value?: unknown;
+  errors?: string[];
+  children?: ValidationErrorDetail[];
+}
 
 export class NotFoundError extends DomainError {
-  readonly code: DOMAIN_ERROR_CODES = DOMAIN_ERROR_CODES.NOT_FOUND;
+  readonly type = DomainErrorType.NOT_FOUND;
   constructor(props: BaseErrorProps) {
-    super({ code: DOMAIN_ERROR_CODES.NOT_FOUND, ...props });
+    super({ ...props, type: DomainErrorType.NOT_FOUND });
   }
 }
 
 export class ConflictError extends DomainError {
-  readonly code: DOMAIN_ERROR_CODES = DOMAIN_ERROR_CODES.CONFLICT;
+  readonly type = DomainErrorType.CONFLICT;
   constructor(props: BaseErrorProps) {
-    super({ code: DOMAIN_ERROR_CODES.CONFLICT, ...props });
+    super({ ...props, type: DomainErrorType.CONFLICT });
   }
 }
 
 export class ValidationError extends DomainError {
-  readonly code: DOMAIN_ERROR_CODES = DOMAIN_ERROR_CODES.VALIDATION;
-  constructor(props: BaseErrorProps) {
-    super({ code: DOMAIN_ERROR_CODES.VALIDATION, ...props });
+  readonly type = DomainErrorType.VALIDATION;
+  readonly details: ValidationErrorDetail[];
+
+  constructor(props: BaseErrorProps, details: ValidationErrorDetail[] = []) {
+    super({ ...props, type: DomainErrorType.VALIDATION });
+    this.details = details;
   }
 }
 
 export class UnknownError extends DomainError {
-  readonly code: DOMAIN_ERROR_CODES = DOMAIN_ERROR_CODES.UNKNOWN_ERROR;
+  readonly type = DomainErrorType.UNKNOWN;
   constructor(props: BaseErrorProps) {
-    super({ code: DOMAIN_ERROR_CODES.UNKNOWN_ERROR, ...props });
+    super({ ...props, type: DomainErrorType.UNKNOWN });
   }
 }
