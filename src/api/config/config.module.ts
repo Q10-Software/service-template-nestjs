@@ -9,7 +9,7 @@ import { envSchema } from './validation/env.schema';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: false,
+      isGlobal: true,
       load: [appConfig, httpConfig, loggerConfig, cacheConfig],
       validationSchema: envSchema,
       cache: true,

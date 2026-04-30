@@ -1,12 +1,14 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { ResponseWrapperInterceptor } from '../interceptors/responseWrapper.interceptor';
+import { ResultInterceptor } from '../interceptors/result.interceptor';
+import { AllExceptionsFilter } from '../filters/allExceptions.filter';
 import { ServiceInfoModule } from './serviceInfo/serviceInfo.module';
 import { HealthModule } from './health/health.module';
 import { ApiConfigModule } from '../config/config.module';
 import { LoggingModule } from './logging/logging.module';
 import { RequestLoggingMiddleware } from './logging/requestLogging.middleware';
 import { SentryModule } from '@sentry/nestjs/setup';
-import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 import { ConfigService } from '@nestjs/config';
 import { CacheConfig, LoggerConfig } from 'src/api/config/config.types';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -31,6 +33,7 @@ import KeyvRedis from '@keyv/redis';
     }),
     SentryModule.forRoot(),
     LoggingModule.forRootAsync({
+      global: true,
       imports: [ApiConfigModule],
       useFactory: (configService: ConfigService) => {
         const config = configService.getOrThrow<LoggerConfig>('logger');
@@ -54,7 +57,15 @@ import KeyvRedis from '@keyv/redis';
   providers: [
     {
       provide: APP_FILTER,
-      useClass: SentryGlobalFilter,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseWrapperInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResultInterceptor,
     },
   ],
 })
