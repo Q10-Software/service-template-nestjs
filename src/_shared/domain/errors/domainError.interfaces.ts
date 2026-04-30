@@ -1,8 +1,10 @@
-import { DOMAIN_ERROR_CODES } from "./domainErrors.constants";
+import { DomainErrorType } from './domainErrors.constants';
 
 export interface DomainErrorProps {
-    code: DOMAIN_ERROR_CODES;
-    context: string;
-    message: string;
-    attributes?: Record<string, unknown>;
-  }
+  type: DomainErrorType;
+  code: string;
+  context: string;
+  origin: string;
+  message: string;
+  attributes?: Record<string, unknown>;
+}

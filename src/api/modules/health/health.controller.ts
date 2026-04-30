@@ -5,7 +5,11 @@ import {
   HealthCheckService,
   MemoryHealthIndicator,
 } from '@nestjs/terminus';
+import { SkipResponseWrap } from '../../decorators/skipResponseWrap.decorator';
+import { Result } from '@shared/domain/result/result';
+import { healthErrors } from './health.errors';
 
+@SkipResponseWrap()
 @Controller()
 export class HealthController {
   constructor(
@@ -23,6 +27,10 @@ export class HealthController {
 
   @Get('/debug')
   getError() {
-    throw new Error(`Debug error! -> at ${new Date().toISOString()}`);
+    return Result.fail(
+      healthErrors.checkFailed('HealthController.getError', {
+        date: new Date().toISOString(),
+      }),
+    );
   }
 }
