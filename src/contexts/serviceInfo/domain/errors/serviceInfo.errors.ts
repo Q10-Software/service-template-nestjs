@@ -6,6 +6,10 @@ export const ServiceInfoErrorCode = {
   NOT_FOUND: 'SERVICE_INFO_NOT_FOUND',
   UNAVAILABLE: 'SERVICE_INFO_UNAVAILABLE',
   MAPPER_VALIDATION: 'SERVICE_INFO_MAPPER_VALIDATION_FAILED',
+  INVALID_STATUS: 'SERVICE_INFO_INVALID_STATUS',
+  INVALID_NAME: 'SERVICE_INFO_INVALID_NAME',
+  INVALID_VERSION: 'SERVICE_INFO_INVALID_VERSION',
+  INVALID_STARTED_AT: 'SERVICE_INFO_INVALID_STARTED_AT',
 } as const;
 
 export type ServiceInfoErrorCode = typeof ServiceInfoErrorCode[keyof typeof ServiceInfoErrorCode];
@@ -37,4 +41,40 @@ export const serviceInfoErrors = {
       message: 'Validation failed',
       attributes,
     }, details),
+
+  invalidStatus: (origin: string, attributes?: Record<string, unknown>) =>
+    new ValidationError({
+      context,
+      code: ServiceInfoErrorCode.INVALID_STATUS,
+      origin,
+      message: 'Invalid service status',
+      attributes,
+    }),
+
+  invalidName: (origin: string, attributes?: Record<string, unknown>) =>
+    new ValidationError({
+      context,
+      code: ServiceInfoErrorCode.INVALID_NAME,
+      origin,
+      message: 'Invalid service name',
+      attributes,
+    }),
+
+  invalidVersion: (origin: string, attributes?: Record<string, unknown>) =>
+    new ValidationError({
+      context,
+      code: ServiceInfoErrorCode.INVALID_VERSION,
+      origin,
+      message: 'Invalid service version',
+      attributes,
+    }),
+
+  invalidStartedAt: (origin: string, attributes?: Record<string, unknown>) =>
+    new ValidationError({
+      context,
+      code: ServiceInfoErrorCode.INVALID_STARTED_AT,
+      origin,
+      message: 'Invalid service startedAt date',
+      attributes,
+    }),
 };

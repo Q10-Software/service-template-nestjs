@@ -15,7 +15,7 @@ export class GetServiceInfoMapper {
   toResponse(result: Result<GetServiceInfoOutput, DomainError>): MapperResponse {
     if (result.isFail) return result;
 
-    const dto = plainToInstance(GetServiceInfoDto, {...result.value, status: 1});
+    const dto = plainToInstance(GetServiceInfoDto, {...result.value});
 
     const errors: ValidationError[] = validateSync(dto, {
       forbidUnknownValues: true,
