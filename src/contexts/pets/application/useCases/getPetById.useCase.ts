@@ -1,35 +1,26 @@
-import { petsError } from '@context/pets/domain/errors/pets.error';
+import { AsyncUseCase } from '@shared/application/useCases/asyncUseCase.interface';
+import { Result } from '@shared/domain/result/result';
+import { DomainError } from '@shared/domain/errors/domainError';
 import { IPetRepository } from '../../domain/repositories/pet.repository';
-import { NotFoundError } from '@shared/domain/errors/baseErrors';
+import { GetPetByIdInput, GetPetByIdOutput } from './getPetById.dto';
 
-export interface GetPetByIdInput {
-  id: string;
-}
+const ORIGIN = 'GetPetByIdUseCase.execute';
 
-export interface GetPetByIdOutput {
-  id: string;
-  name: string;
-  birthDate: Date;
-  breed: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export class GetPetByIdUseCase {
+export class GetPetByIdUseCase implements AsyncUseCase<GetPetByIdInput, GetPetByIdOutput> {
   constructor(private readonly petRepository: IPetRepository) {}
 
-  async execute(input: GetPetByIdInput): Promise<GetPetByIdOutput | NotFoundError> {
-    const aggregate = await this.petRepository.findById(input.id);
+  async execute(input: GetPetByIdInput): Promise<Result<GetPetByIdOutput, DomainError>> {
+    const result = await this.petRepository.findById(input.id);
+    if (result.isFail) return Result.fail(result.error);
 
-    if (!aggregate) return petsError.notFoundById(input.id);
-
-    return {
+    const aggregate = result.value;
+    return Result.ok({
       id: aggregate.id,
       name: aggregate.name,
       birthDate: aggregate.birthDate,
       breed: aggregate.breed,
       createdAt: aggregate.createdAt,
       updatedAt: aggregate.updatedAt,
-    };
+    });
   }
 }

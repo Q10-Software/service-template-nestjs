@@ -18,7 +18,7 @@ import { GetPetByIdUseCase } from '@context/pets/application/useCases/getPetById
 import { ListPetsUseCase } from '@context/pets/application/useCases/listPets.useCase';
 import { UpdatePetUseCase } from '@context/pets/application/useCases/updatePet.useCase';
 import { Result } from '@shared/domain/result/result';
-import { ConflictError, NotFoundError } from '@shared/domain/errors/baseErrors';
+import { DomainError } from '@shared/domain/errors/domainError';
 
 import { CreatePetBodyDto, PetResponseDto, UpdatePetBodyDto } from './pets.dto';
 import { ResultCacheInterceptor } from '../../interceptors/resultCache.interceptor';
@@ -38,17 +38,17 @@ export class PetsController {
 
   @Post()
   @CacheInvalidate('/pets')
-  create(@Body() body: CreatePetBodyDto): Promise<Result<PetResponseDto, ConflictError>> {
+  create(@Body() body: CreatePetBodyDto): Promise<Result<PetResponseDto, DomainError>> {
     return this.createPetUseCase.execute(body);
   }
 
   @Get()
-  findAll(): Promise<Result<PetResponseDto[], never>> {
+  findAll(): Promise<Result<PetResponseDto[], DomainError>> {
     return this.listPetsUseCase.execute();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Result<PetResponseDto, NotFoundError>> {
+  findOne(@Param('id') id: string): Promise<Result<PetResponseDto, DomainError>> {
     return this.getPetByIdUseCase.execute({ id });
   }
 
@@ -60,7 +60,7 @@ export class PetsController {
   update(
     @Param('id') id: string,
     @Body() body: UpdatePetBodyDto,
-  ): Promise<Result<PetResponseDto, NotFoundError>> {
+  ): Promise<Result<PetResponseDto, DomainError>> {
     return this.updatePetUseCase.execute({ id, ...body });
   }
 
@@ -70,7 +70,7 @@ export class PetsController {
     '/pets',
     (ctx: ExecutionContext) => `/pets/${ctx.switchToHttp().getRequest<{ params: { id: string } }>().params.id}`,
   )
-  remove(@Param('id') id: string): Promise<Result<void, NotFoundError>> {
+  remove(@Param('id') id: string): Promise<Result<void, DomainError>> {
     return this.deletePetUseCase.execute({ id });
   }
 }

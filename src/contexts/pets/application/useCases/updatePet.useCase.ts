@@ -1,46 +1,34 @@
+import { AsyncUseCase } from '@shared/application/useCases/asyncUseCase.interface';
+import { Result } from '@shared/domain/result/result';
+import { DomainError } from '@shared/domain/errors/domainError';
 import { IPetRepository } from '../../domain/repositories/pet.repository';
+import { UpdatePetInput, UpdatePetOutput } from './updatePet.dto';
 
-export interface UpdatePetInput {
-  id: string;
-  name: string;
-  birthDate: Date;
-  breed: string;
-}
-
-export interface UpdatePetOutput {
-  id: string;
-  name: string;
-  birthDate: Date;
-  breed: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export class UpdatePetUseCase {
+export class UpdatePetUseCase implements AsyncUseCase<UpdatePetInput, UpdatePetOutput> {
   constructor(private readonly petRepository: IPetRepository) {}
 
-  async execute(input: UpdatePetInput): Promise<UpdatePetOutput | undefined> {
-    const existing = await this.petRepository.findById(input.id);
+  async execute(input: UpdatePetInput): Promise<Result<UpdatePetOutput, DomainError>> {
+    const existingResult = await this.petRepository.findById(input.id);
+    if (existingResult.isFail) return Result.fail(existingResult.error);
 
-    if (!existing) return undefined;
-
-    const updated = existing.update({
+    const updatedResult = existingResult.value.update({
       name: input.name,
       birthDate: input.birthDate,
       breed: input.breed,
     });
+    if (updatedResult.isFail) return Result.fail(updatedResult.error);
 
-    const saved = await this.petRepository.update(updated);
+    const savedResult = await this.petRepository.update(updatedResult.value);
+    if (savedResult.isFail) return Result.fail(savedResult.error);
 
-    if (!saved) return undefined;
-
-    return {
+    const saved = savedResult.value;
+    return Result.ok({
       id: saved.id,
       name: saved.name,
       birthDate: saved.birthDate,
       breed: saved.breed,
       createdAt: saved.createdAt,
       updatedAt: saved.updatedAt,
-    };
+    });
   }
 }

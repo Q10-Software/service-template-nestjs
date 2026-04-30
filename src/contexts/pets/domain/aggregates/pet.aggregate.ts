@@ -1,51 +1,70 @@
 import { randomUUID } from 'node:crypto';
 
+import { Result } from '@shared/domain/result/result';
 import { RootAggregate } from '@shared/domain/aggregates/root.aggregate';
 
 import { CreatePetProps, IPet, UpdatePetProps } from '../entities/pet.entity';
+import { PetName } from '../valueObjects/petName.vo';
+import { PetBirthDate } from '../valueObjects/petBirthDate.vo';
+import { PetBreed } from '../valueObjects/petBreed.vo';
 
 export class PetAggregate extends RootAggregate<IPet> {
-  constructor(entity: IPet) {
-    super(entity);
+  get name(): string {
+    return this._entity.name.value;
   }
 
-  get name(): IPet['name'] {
-    return this._entity.name;
+  get birthDate(): Date {
+    return this._entity.birthDate.value;
   }
 
-  get birthDate(): IPet['birthDate'] {
-    return this._entity.birthDate;
+  get breed(): string {
+    return this._entity.breed.value;
   }
 
-  get breed(): IPet['breed'] {
-    return this._entity.breed;
-  }
+  static create(props: CreatePetProps): Result<PetAggregate> {
+    const nameResult = PetName.create(props.name);
+    if (nameResult.isFail) return Result.fail(nameResult.error);
 
-  static create(props: CreatePetProps): PetAggregate {
+    const birthDateResult = PetBirthDate.create(props.birthDate);
+    if (birthDateResult.isFail) return Result.fail(birthDateResult.error);
+
+    const breedResult = PetBreed.create(props.breed);
+    if (breedResult.isFail) return Result.fail(breedResult.error);
+
     const now = new Date();
-    const entity: IPet = {
+    return Result.ok(new PetAggregate({
       id: randomUUID(),
-      name: props.name,
-      birthDate: props.birthDate,
-      breed: props.breed,
+      name: nameResult.value,
+      birthDate: birthDateResult.value,
+      breed: breedResult.value,
       createdAt: now,
       updatedAt: now,
-    };
-    return new PetAggregate(entity);
+    }));
   }
 
-  update(props: UpdatePetProps): PetAggregate {
-    const now = new Date();
+  update(props: UpdatePetProps): Result<PetAggregate> {
+    const nameResult = props.name !== undefined
+      ? PetName.create(props.name)
+      : Result.ok(this._entity.name);
+    if (nameResult.isFail) return Result.fail(nameResult.error);
 
-    const entity: IPet = {
+    const birthDateResult = props.birthDate !== undefined
+      ? PetBirthDate.create(props.birthDate)
+      : Result.ok(this._entity.birthDate);
+    if (birthDateResult.isFail) return Result.fail(birthDateResult.error);
+
+    const breedResult = props.breed !== undefined
+      ? PetBreed.create(props.breed)
+      : Result.ok(this._entity.breed);
+    if (breedResult.isFail) return Result.fail(breedResult.error);
+
+    return Result.ok(new PetAggregate({
       id: this._entity.id,
       createdAt: this._entity.createdAt,
-      name: props.name ?? this._entity.name,
-      birthDate: props.birthDate ?? this._entity.birthDate,
-      breed: props.breed ?? this._entity.breed,
-      updatedAt: now,
-    };
-
-    return new PetAggregate(entity);
+      name: nameResult.value,
+      birthDate: birthDateResult.value,
+      breed: breedResult.value,
+      updatedAt: new Date(),
+    }));
   }
 }

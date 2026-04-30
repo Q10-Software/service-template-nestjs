@@ -3,6 +3,7 @@ import { ConflictError, NotFoundError } from '@shared/domain/errors/baseErrors';
 import { IRootEntity } from '@shared/domain/interfaces/root.entity';
 import { IRootRepository } from '@shared/domain/repositories/root.repository';
 import { Result } from '@shared/domain/result/result';
+import { ICache } from '@infrastructure/interfaces/cache.interface';
 import { IDocumentRootEntity } from '../interfaces/doc.root';
 
 export abstract class RootMemoryRepository<
@@ -12,15 +13,24 @@ export abstract class RootMemoryRepository<
   private readonly store = new Map<string, D>();
   private readonly cacheKey: string;
 
+  constructor(
+    protected readonly cache: ICache,
+    cacheKey: string,
+  ) {
+    this.cacheKey = cacheKey;
+  }
+
   async create(aggregate: A): Promise<Result<A, ConflictError>> {
     if (this.store.has(aggregate.id)) {
       return Result.fail(
         new ConflictError({
           context: 'REPOSITORY',
+          code: 'REPOSITORY_CONFLICT',
+          origin: `${this.cacheKey}.create`,
           message: `Entity with id "${String(aggregate.id)}" already exists`,
         }),
       );
-    }    
+    }
 
     const document = this.toDocument(aggregate);
     this.store.set(document.id, document);
@@ -35,6 +45,8 @@ export abstract class RootMemoryRepository<
       return Result.fail(
         new NotFoundError({
           context: 'REPOSITORY',
+          code: 'REPOSITORY_NOT_FOUND',
+          origin: `${this.cacheKey}.findById`,
           message: `Entity with id "${String(id)}" not found`,
         }),
       );
@@ -53,6 +65,8 @@ export abstract class RootMemoryRepository<
       return Result.fail(
         new NotFoundError({
           context: 'REPOSITORY',
+          code: 'REPOSITORY_NOT_FOUND',
+          origin: `${this.cacheKey}.update`,
           message: `Entity with id "${String(aggregate.id)}" not found`,
         }),
       );
@@ -69,6 +83,8 @@ export abstract class RootMemoryRepository<
       return Result.fail(
         new NotFoundError({
           context: 'REPOSITORY',
+          code: 'REPOSITORY_NOT_FOUND',
+          origin: `${this.cacheKey}.delete`,
           message: `Entity with id "${String(id)}" not found`,
         }),
       );
