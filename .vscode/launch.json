@@ -10,6 +10,7 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "autoAttachChildProcesses": true,
+      "killBehavior": "polite",
       "skipFiles": ["<node_internals>/**"],
       "sourceMaps": true,
       "resolveSourceMapLocations": [

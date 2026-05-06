@@ -6,6 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './modules/app.module';
 import { HttpConfig } from './config/config.types';
 import { LoggerService } from './modules/logging/logger.service';
+import { validationPipeOptions } from './config/validation/validationPipe.options';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,14 +16,10 @@ async function bootstrap() {
   const httpConfig = configService.getOrThrow<HttpConfig>('http');
 
   app.useLogger(loggerService);
-  
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      transformOptions: { enableImplicitConversion: true },
-    }),
-  );
+
+  app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
+
+  app.enableShutdownHooks();
 
   return app.listen(httpConfig.port);
 }
