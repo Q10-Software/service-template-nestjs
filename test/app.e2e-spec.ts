@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
+import { Test, TestingModule } from '@nestjs/testing'
 import request from 'supertest'
 import { App } from 'supertest/types'
 import { AppModule } from '../src/api/modules/app.module'
@@ -22,16 +22,19 @@ describe('AppInfoController (e2e)', () => {
       .expect(200)
       .expect((res) => {
         const body = res.body as {
-          status: string
-          serviceName: string
-          version: string
-          startedAt: string
+          data: {
+            status: string
+            name: string
+            version: string
+            startedAt: string
+          }
+          statusCode: number
         }
-        expect(body.status).toBe('ok')
-        expect(body.serviceName).toBe('ddd-nestjs-template')
-        expect(body.version).toBe('0.0.1')
-        expect(typeof body.startedAt).toBe('string')
-        expect(new Date(body.startedAt).toString()).not.toBe('Invalid Date')
+        expect(body.data.status).toBe('ok')
+        expect(body.data.name).toBe('ddd-nestjs-template')
+        expect(body.data.version).toBe('0.0.1')
+        expect(typeof body.data.startedAt).toBe('string')
+        expect(new Date(body.data.startedAt).toString()).not.toBe('Invalid Date')
       })
   })
 })
