@@ -1,19 +1,19 @@
-import 'dotenv/config';
-import * as Sentry from '@sentry/nestjs';
+import 'dotenv/config'
+import * as Sentry from '@sentry/nestjs'
 
 function parseSampleRate(value: string | undefined, fallback: number): number {
   if (value === undefined || value === '') {
-    return fallback;
+    return fallback
   }
-  const n = Number(value);
+  const n = Number(value)
   if (!Number.isFinite(n)) {
-    return fallback;
+    return fallback
   }
-  return Math.min(1, Math.max(0, n));
+  return Math.min(1, Math.max(0, n))
 }
 
 function main(dsn: string | undefined) {
-  if (!dsn) return;
+  if (!dsn) return
 
   Sentry.init({
     enableLogs: process.env.SENTRY_ENABLE_LOGS !== 'false',
@@ -25,14 +25,14 @@ function main(dsn: string | undefined) {
         : undefined,
     tracesSampleRate: parseSampleRate(
       process.env.SENTRY_TRACES_SAMPLE_RATE,
-      process.env.NODE_ENV === 'production' ? 0.2 : 1,
+      process.env.NODE_ENV === 'production' ? 0.2 : 1
     ),
     sendDefaultPii:
       process.env.SENTRY_SEND_DEFAULT_PII === 'true' ||
-      process.env.SENTRY_SEND_DEFAULT_PII === '1',
-  });
+      process.env.SENTRY_SEND_DEFAULT_PII === '1'
+  })
 }
 
-const dsn = process.env.SENTRY_DSN;
+const dsn = process.env.SENTRY_DSN
 
-main(dsn);
+main(dsn)

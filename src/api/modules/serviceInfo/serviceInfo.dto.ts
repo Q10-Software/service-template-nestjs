@@ -1,16 +1,16 @@
-import { IsDate, IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { IsDate, IsIn, IsNotEmpty, IsString } from 'class-validator'
 
 export class GetServiceInfoDto {
   @IsNotEmpty()
   @IsIn(['ok'])
-  status!: 'ok';
+  status!: 'ok'
 
   @IsString()
-  name!: string;
+  name!: string
 
   @IsString()
-  version!: string;
+  version!: string
 
   @IsDate()
-  startedAt!: Date;
+  startedAt!: Date
 }

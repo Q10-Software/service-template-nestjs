@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import appConfig from './factories/app.config';
-import httpConfig from './factories/http.config';
-import loggerConfig from './factories/logger.config';
-import { envSchema } from './validation/env.schema';
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import appConfig from './factories/app.config'
+import httpConfig from './factories/http.config'
+import loggerConfig from './factories/logger.config'
+import { envSchema } from './validation/env.schema'
 
 @Module({
   imports: [
@@ -12,9 +12,9 @@ import { envSchema } from './validation/env.schema';
       load: [appConfig, httpConfig, loggerConfig],
       validationSchema: envSchema,
       cache: true,
-      expandVariables: true,
-    }),
+      expandVariables: true
+    })
   ],
-  exports: [ConfigModule],
+  exports: [ConfigModule]
 })
 export class ApiConfigModule {}

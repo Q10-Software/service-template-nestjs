@@ -2,14 +2,14 @@ export abstract class ValueObject<T> {
   protected constructor(protected readonly _value: T) {}
 
   get value(): T {
-    return this._value;
+    return this._value
   }
 
   equals(other: ValueObject<T>): boolean {
-    return JSON.stringify(this._value) === JSON.stringify(other._value);
+    return JSON.stringify(this._value) === JSON.stringify(other._value)
   }
 }
 
 export type ValueObjectStatic<T, V extends ValueObject<T>> = {
-  create(value: T): V;
-};
+  create(value: T): V
+}

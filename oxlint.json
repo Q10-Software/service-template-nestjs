@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["typescript"],
+  "env": {
+    "node": true,
+    "jest": true
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "eqeqeq": ["error", "always"],
+    "no-var": "error",
+    "prefer-const": "error",
+    "no-throw-literal": "error",
+    "no-new": "warn",
+    "no-return-assign": ["error", "except-parens"],
+    "no-console": "warn",
+    "no-debugger": "error",
+    "no-underscore-dangle": "off",
+    "typescript/no-extraneous-class": ["warn", { "allowWithDecorator": true }],
+    "typescript/no-unnecessary-parameter-property-assignment": "off"
+  },
+  "ignorePatterns": ["dist", "coverage", "node_modules"]
+}

@@ -1,4 +1,4 @@
 export interface GetServiceInfoPortOutput {
-  name: string;
-  version: string;
+  name: string
+  version: string
 }
